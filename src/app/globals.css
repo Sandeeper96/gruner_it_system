@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+.dashboard-scren-main-container{
+  background-image: url(./../../public/gruner.jpeg);
+  background-repeat: no-repeat;
+   background-size: cover;
+  background-position: center;
+  height: 100vh;
+  /* width: 100vw; */
+}
+
+/* .dashboard-scren-main-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.1); 
+  z-index: 1;
+} */
+
+h1, h2, h3, p {
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  z-index: 2;
+  position: relative;
+  /* text-shadow: 1px 1px 4px rgba(0,0,0,0.7); */
+}
+.navbar {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  color: #fff;
+}
+.fade-in {
+  animation: fadeIn ease 1.5s;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.hero-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  z-index: 2;
+  position: relative;
+}
+
+
+
+.TeamSection-module__Lm6bHa__imageWrapper h3{
+  color: #0a0a0a;
+}

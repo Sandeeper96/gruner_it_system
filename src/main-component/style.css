@@ -1,0 +1,16 @@
+.all-pages-main-container{
+    padding: 70px;
+    flex-direction: column;
+    gap: 30px;
+
+}
+.all-pages-main-container-inner{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+}
+/* .flex-column-inner{
+display: flex;
+flex-direction: column;
+} */
