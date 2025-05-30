@@ -2,6 +2,9 @@
 
 export default function Dashboard() {
   return (
+    <div>
+
+ 
     <div className="p-6 space-y-8 bg-blue-50 min-h-screen dashboard-scren-main-container">
       {/* <h1 style={{color:"#ee7100"}} className="text-4xl font-bold text-center">GRUNER INDIA IT SYSTEM</h1>
       <p style={{color:"#ee7100"}} className="text-center text-lg">Employee Inventory Management System</p> */}
@@ -78,6 +81,26 @@ export default function Dashboard() {
       </div> */}
     
     </div>
+        <div style={{textAlign:"center"}}   className="text-center">
+  <video
+  src={'../../it-team/gruner_it_intro_2.mp4'}
+    autoPlay
+    controls
+    muted
+    loop
+    playsInline
+    className="video-dashboard"
+    style={{
+      // position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '90%',
+      objectFit: 'cover'
+    }}
+      />
+</div>
+</div>
   )
 }
 

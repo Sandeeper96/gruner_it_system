@@ -77,3 +77,7 @@ h1, h2, h3, p {
 .TeamSection-module__Lm6bHa__imageWrapper h3{
   color: #0a0a0a;
 }
+
+.video-dashboard::-webkit-media-controls {
+  display: none;
+}
