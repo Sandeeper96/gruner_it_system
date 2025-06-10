@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+
 import { CompactTable } from '@table-library/react-table-library/compact';
 import { useTheme } from '@table-library/react-table-library/theme';
 import Header from '@/main-component/main-header';
@@ -12,10 +13,7 @@ import "./style.css"
 
 import { useState, useEffect } from 'react';
 import { DataGrid, SelectColumn } from 'react-data-grid';
-
-
-
-;
+import { getAllocationInventory } from "../../../lib/api/userApi";
 
 
 
@@ -23,7 +21,7 @@ export default function AssetTable() {
       const [isOpen, setIsOpen] = React.useState(false);
       const [rows, setRows] = React.useState([]);
     const [selectedRows, setSelectedRows] = useState(() => new Set());
-
+ const [error, setError] = useState('');
       const [sortColumns, setSortColumns] = useState([]);
 const [filters, setFilters] = useState({});
    const [formData, setFormData] = React.useState({
@@ -42,6 +40,21 @@ const [filters, setFilters] = useState({});
     invoiceDate: ''
   });
 
+       useEffect(() => {
+          const fetchUsers = async () => {
+            const result = await getAllocationInventory();
+      
+            if (result.success) {
+              // setEmloyeeList(result.data);
+                 setRows(result.data);
+            } else {
+              setError(result.error);
+            }
+          };
+      
+          fetchUsers();
+        }, []);
+
 //   React.useEffect(() => {
 //   const storedData = JSON.parse(localStorage.getItem('assets')) || [];
 //   console.log("storedData",storedData);
@@ -50,9 +63,9 @@ const [filters, setFilters] = useState({});
 // }, []);
 
 React.useEffect(() => {
-  const storedData = JSON.parse(localStorage.getItem('assets')) || [];
-  const dataWithIds = storedData.map((item, index) => ({ ...item, id: index }));
-  setRows(dataWithIds);
+  // const storedData = JSON.parse(localStorage.getItem('assets')) || [];
+  // const dataWithIds = storedData.map((item, index) => ({ ...item, id: index }));
+  // setRows(dataWithIds);
 }, []);
 
 const sortedRows = React.useMemo(() => {
@@ -129,9 +142,9 @@ const filteredRows = React.useMemo(() => {
   return `${day}-${month}-${year}`;
 };
 const handleDelete = (indexToDelete) => {
-  const updatedAssets = rows.filter((_, index) => index !== indexToDelete);
-  setRows(updatedAssets);
-  localStorage.setItem('assets', JSON.stringify(updatedAssets));
+  // const updatedAssets = rows.filter((_, index) => index !== indexToDelete);
+  // setRows(updatedAssets);
+  // localStorage.setItem('assets', JSON.stringify(updatedAssets));
 };
 const handleSubmit = (e) => {
   e.preventDefault();
@@ -144,14 +157,8 @@ const handleSubmit = (e) => {
     invoiceDate: formatDate(formData.invoiceDate),
   };
 
-  // Get current array from localStorage (or create new one)
-  const existingAssets = JSON.parse(localStorage.getItem('assets')) || [];
 
-  // Add the new asset
-  const updatedAssets = [...existingAssets, formattedData];
 
-  // Save updated array back to localStorage
-  localStorage.setItem('assets', JSON.stringify(updatedAssets));
 
   // Reset form
   setFormData({
@@ -351,7 +358,7 @@ console.log("rows",rows)
   style={{ background: '#4CAF50', marginBottom: '20px', marginLeft: '10px' }}
   onClick={exportToCSV}
 >
-  Export to CSV
+  Export to CSV s
 </CustomButton>
 
   <DataGrid     rowKeyGetter={rowKeyGetter}

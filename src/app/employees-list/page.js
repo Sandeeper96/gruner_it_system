@@ -8,16 +8,22 @@ import CustomButton from '@/core-component/custom_button';
 import CustomModal from '@/core-component/custom_modal';
 import 'react-data-grid/lib/styles.css';
 import './style.css';
+ import {getAllEmployee} from "../../../lib/api/userApi"
+import { addAllEmployee } from "../../../lib/api/userApi";
+import { updateEmployee } from "../../../lib/api/userApi";
 
 export default function EmployeesTable() {
+  console.log("getAllEmployee",getAllEmployee())
   const [isOpen, setIsOpen] = useState(false);
   const [rows, setRows] = useState([]);
   const [selectedRows, setSelectedRows] = useState(() => new Set());
   const [sortColumns, setSortColumns] = useState([]);
   const [filters, setFilters] = useState({});
+  const [editingEmployee, setEditingEmployee] = useState(null);
+
 
   const [formData, setFormData] = useState({
-    sno: '',
+    // sno: '',
     employeeCode: '',
     employeeName: '',
     department: '',
@@ -26,16 +32,40 @@ export default function EmployeesTable() {
     emailId: ''
   });
 
+      const [emplyeeList, setEmloyeeList] = useState([]);
+      const [error, setError] = useState('');
+
+      console.log("formData",formData);
+      
+    
+        useEffect(() => {
+        const fetchUsers = async () => {
+          const result = await getAllEmployee();
+    
+          if (result.success) {
+            setEmloyeeList(result.data);
+               setRows(result.data);
+          } else {
+            setError(result.error);
+          }
+        };
+    
+        fetchUsers();
+      }, []);
+
+
+     
+
  useEffect(() => {
-  const storedString = localStorage.getItem('All_EMPLOYEE_LIST');
-  const storedData = storedString ? JSON.parse(storedString) : [];
+//   const storedString = localStorage.getItem('All_EMPLOYEE_LIST');
+//   const storedData = storedString ? JSON.parse(storedString) : [];
+//  setRows(emplyeeList);
+//   console.log("storedData", storedData);
 
-  console.log("storedData", storedData);
-
-  if (Array.isArray(storedData)) {
-    const dataWithIds = storedData.map((item, index) => ({ ...item, id: index }));
-    setRows(dataWithIds);
-  }
+//   if (Array.isArray(storedData)) {
+//     const dataWithIds = storedData.map((item, index) => ({ ...item, id: index }));
+   
+//   }
 }, []);
 
 
@@ -103,14 +133,69 @@ export default function EmployeesTable() {
     link.click();
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+ 
+//   const handleSubmit = async (e) => {
+//   e.preventDefault();
 
-    const existingEmployees = JSON.parse(localStorage.getItem('All_EMPLOYEE_LIST')) || [];
-    const updatedEmployees = [...existingEmployees, formData];
-    localStorage.setItem('All_EMPLOYEE_LIST', JSON.stringify(updatedEmployees));
-    setRows(updatedEmployees.map((item, index) => ({ ...item, id: index })));
+//   const payload = {
+//     employeeCode: formData.employeeCode,
+//     employeeName: formData.employeeName,
+//     department: formData.department,
+//     designation: formData.designation,
+//     location: formData.location,
+//     email: formData.emailId
+//   };
 
+//   const result = await addAllEmployee(payload);
+
+//   if (result.success) {
+//     const newEmployee = {
+//       ...result.data,
+//       id: rows.length > 0 ? Math.max(...rows.map(r => r.id)) + 1 : 0
+//     };
+
+//     setRows(prev => [...prev, newEmployee]);
+//     setFormData({
+//       sno: '',
+//       employeeCode: '',
+//       employeeName: '',
+//       department: '',
+//       designation: '',
+//       location: '',
+//       emailId: ''
+//     });
+//     setIsOpen(false);
+//   } else {
+//     alert(result.error); // Show error if employeeCode already exists
+//   }
+// };
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const payload = {
+    employeeName: formData.employeeName,
+    department: formData.department,
+    designation: formData.designation,
+    location: formData.location,
+    email: formData.emailId
+  };
+
+  let result;
+  if (editingEmployee) {
+    
+    result = await updateEmployee(formData.employeeCode, payload);
+    console.log('Updating employee with code:', formData.employeeCode);
+  } else {
+    result = await addAllEmployee({ ...payload, employeeCode: formData.employeeCode });
+  }
+
+  if (result.success) {
+    const fetchResult = await getAllEmployee();
+    if (fetchResult.success) {
+      
+      setRows(fetchResult.data.map((item, index) => ({ ...item, id: index })));
+    }
     setFormData({
       sno: '',
       employeeCode: '',
@@ -120,14 +205,25 @@ export default function EmployeesTable() {
       location: '',
       emailId: ''
     });
-
+    setEditingEmployee(null);
     setIsOpen(false);
-  };
+  } else {
+    alert(result.error);
+  }
+};
+
+console.log("isOpen",isOpen);
+
 
   function inventoryFormEmployee() {
     return (
       <div className="p-6">
-        <CustomModal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Employee Form">
+        <CustomModal   isOpen={isOpen}
+  onClose={() => {
+    setIsOpen(false);
+    setEditingEmployee(null); // reset editing state
+  }}
+  title={editingEmployee ? 'Edxxit Employee' : 'Add Employevfe'}>
           <form
             onSubmit={handleSubmit}
             style={{
@@ -152,7 +248,7 @@ export default function EmployeesTable() {
                 />
               </div>
             ))}
-            <button type="submit" style={{ marginTop: '25px', padding: '0.1rem', fontWeight: 'bold', background: 'hsl(28, 100%, 47%)' }}>Add Employee</button>
+            <button type="submit" style={{ marginTop: '20px', padding: '0.4rem', fontWeight: 'bold', background: 'hsl(28, 100%, 47%)' }}> {editingEmployee ? 'Update Employee' : 'Add Employee'}</button>
           </form>
         </CustomModal>
       </div>
@@ -196,21 +292,39 @@ export default function EmployeesTable() {
       headerCellClass: 'text-center',
       cellClass: 'text-center'
     },
-    { key: 'sno', name: 'S.No',  },
+  {
+  key: 'sno',
+  name: 'S.No',
+  width: 60,
+  frozen: true,
+  renderCell: ({ row, rowIdx }) => rowIdx + 1
+},
     { key: 'employeeCode', name: 'Employee Code' },
     { key: 'employeeName', name: 'Employee Name' },
     { key: 'department', name: 'Department' },
     { key: 'designation', name: 'Designation' },
     { key: 'location', name: 'Location' },
-    { key: 'emailId', name: 'Email ID' }
+    { key: 'email', name: 'Email ID' }
   ];
 
   return (
     <div>
       <Header />
       <div style={{ background: '#000' }}>
-        <CustomButton style={{ background: '#FFA500', marginBottom: '20px', marginLeft: '20px' }} onClick={() => setIsOpen(true)}>
-          Add New
+        <CustomButton style={{ background: '#FFA500', marginBottom: '20px', marginLeft: '20px' }}   onClick={() => {
+   setFormData({
+      sno: '',
+      employeeCode: '',
+      employeeName: '',
+      department: '',
+      designation: '',
+      location: '',
+      emailId: ''
+    });
+     setEditingEmployee(null);
+    setIsOpen(true);
+  }}>
+          Add New new
         </CustomButton>
         <CustomButton
           style={{ background: '#4CAF50', marginBottom: '20px', marginLeft: '10px' }}
@@ -218,7 +332,7 @@ export default function EmployeesTable() {
         >
           Export to CSV
         </CustomButton>
-        <DataGrid
+        {/* <DataGrid
           rowKeyGetter={rowKeyGetter}
           columns={columns.map(col => ({
             ...col,
@@ -237,7 +351,42 @@ export default function EmployeesTable() {
         draggable: true,
         height:500
       }}
-        />
+        /> */}
+        <DataGrid
+  rowKeyGetter={rowKeyGetter}
+  columns={columns.map(col => ({
+    ...col,
+    sortable: col.key !== 'select'
+  }))}
+  rows={filteredRows.slice(1)}
+  sortColumns={sortColumns}
+  onSortColumnsChange={setSortColumns}
+  selectedRows={selectedRows}
+  onSelectedRowsChange={setSelectedRows}
+  isRowSelectionDisabled={isRowSelectionDisabled}
+  defaultColumnOptions={{
+    minWidth: 100,
+    resizable: true,
+    sortable: true,
+    draggable: true,
+    height: 500
+  }}
+  onCellClick={({row}) => {
+    console.log("formData code",row)
+    setFormData({
+      // sno: '',
+      employeeCode: row.employeeCode,
+      employeeName: row.employeeName,
+      department: row.department,
+      designation: row.designation,
+      location: row.location,
+      emailId: row.email
+    });
+    setEditingEmployee(row); // store the employee being edited
+    setIsOpen(true);
+  }}
+/>
+
       </div>
       {inventoryFormEmployee()}
     </div>

@@ -1,7 +1,10 @@
   
+"use client";
 import Image from 'next/image';
 import styles from './TeamSection.module.css';
 import Header from '@/main-component/main-header';
+import React,{useEffect,useState} from 'react';
+
   const teamMembers = [
   {
     name: "Avinash Gautam",
@@ -30,6 +33,11 @@ import Header from '@/main-component/main-header';
 ];
 
   export default function AboutUs(){
+     const [users, setUsers] = useState([]);
+  const [error, setError] = useState('');
+
+   
+  
 
 
     function TeamSection() {
