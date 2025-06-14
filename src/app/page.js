@@ -1,36 +1,34 @@
-"use client";
-import React,{useState,useEffect} from "react";
+'use client';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Dashboard from "@/components/dashboard";
 import Header from "@/main-component/main-header";
-// import {getAllUsers} from "../../lib/api/userApi"
 
 export default function Home() {
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
-  //      const [users, setUsers] = useState([]);
-  //   const [error, setError] = useState('');
-  
-  //     useEffect(() => {
-  //     const fetchUsers = async () => {
-  //       const result = await getAllUsers();
-  
-  //       if (result.success) {
-  //         setUsers(result.data);
-  //       } else {
-  //         setError(result.error);
-  //       }
-  //     };
-  
-  //     fetchUsers();
-  //   }, []);
-  
-  //   console.log("users",users);
-  // console.log("getAllUsers");
-  // console.log("getAllUsers",getAllUsers());
-  
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login"); // Redirect to login if token not found
+    } else {
+      setIsLoggedIn(true);
+    }
+    setCheckingAuth(false);
+  }, []);
+
+  if (checkingAuth) return <p>Checking authentication...</p>;
+
   return (
-  <div>
-    <Header/>
-    <Dashboard/>
-  </div>
+    <div>
+      {isLoggedIn && (
+        <>
+          <Header />
+          <Dashboard />
+        </>
+      )}
+    </div>
   );
 }
